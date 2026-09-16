@@ -23,12 +23,18 @@
 - Selected .NET 10 LTS / PostgreSQL 18.x / React+TypeScript / Android-first .NET + local SQLite baseline.
 - Established bounded offline authority grants and connected-only privileged configuration/security mutation.
 
-## 2026-09-16 — Repository baseline
+## 2026-09-16 — Repository baseline and Forge nest
 
 - Initialized neutral baseline commit: `045571df669c6e0878320f2099fad958396c27cc`.
-- Baseline contains no application implementation.
+- Established NEST-2 authority at `a62ed69f5649fcb21fdfdbba6a135ea333053ca1`.
+- No application implementation was introduced by nesting.
 
-## 2026-09-16 — Forge nest
+## 2026-09-16 — F01 repository foundation acceptance
 
-- Installing NEST-2 governance and architecture memory.
-- No application implementation introduced by nesting.
+- Reviewed candidate branch `KIRCH-RAVELIN-F01-FOUNDATION` at exact SHA `ea36339844a2e859430ab506daacfda63c16423b`.
+- Verified it is three commits ahead of and directly descended from the accepted baseline with no authority drift.
+- Independently inspected project layering, architecture tests, SDK/package governance, workflow, minimal host and complete candidate tree.
+- Verified GitHub Actions run `35071654539` completed successfully on the exact candidate SHA.
+- Observed evidence includes Release build with 0 warnings/errors, 4/4 solution tests, 3/3 architecture tests, format verification and Authority liveness smoke.
+- F01 accepted for non-force fast-forward promotion.
+- Non-blocking follow-up: future candidate push branches are not generically included in the current validation workflow trigger.
