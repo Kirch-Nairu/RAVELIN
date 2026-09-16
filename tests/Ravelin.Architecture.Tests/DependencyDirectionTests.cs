@@ -6,7 +6,7 @@ namespace Ravelin.Architecture.Tests;
 [TestClass]
 public sealed class DependencyDirectionTests
 {
-    private static readonly IReadOnlyDictionary<string, int> LayerOrder = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase)
+    private static readonly Dictionary<string, int> LayerOrder = new(StringComparer.OrdinalIgnoreCase)
     {
         ["Ravelin.Domain"] = 0,
         ["Ravelin.Application"] = 1,
