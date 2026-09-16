@@ -1,0 +1,12 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Ravelin.Domain/Ravelin.Domain.csproj" />
+    <Project Path="src/Ravelin.Application/Ravelin.Application.csproj" />
+    <Project Path="src/Ravelin.Infrastructure/Ravelin.Infrastructure.csproj" />
+    <Project Path="src/Ravelin.Authority/Ravelin.Authority.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Ravelin.Domain.Tests/Ravelin.Domain.Tests.csproj" />
+    <Project Path="tests/Ravelin.Architecture.Tests/Ravelin.Architecture.Tests.csproj" />
+  </Folder>
+</Solution>

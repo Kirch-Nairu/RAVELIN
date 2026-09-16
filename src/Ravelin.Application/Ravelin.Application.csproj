@@ -1,0 +1,5 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <ProjectReference Include="../Ravelin.Domain/Ravelin.Domain.csproj" />
+  </ItemGroup>
+</Project>
