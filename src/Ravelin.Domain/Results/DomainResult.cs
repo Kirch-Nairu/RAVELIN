@@ -38,11 +38,16 @@ public class DomainResult
 
     public static DomainResult Failure(DomainErrorCode code, string message) =>
         new(new DomainError(code, message));
+
+    public static DomainResult<T> Success<T>(T value) => new(value, null);
+
+    public static DomainResult<T> Failure<T>(DomainErrorCode code, string message) =>
+        new(default, new DomainError(code, message));
 }
 
 public sealed class DomainResult<T> : DomainResult
 {
-    private DomainResult(T? value, DomainError? error)
+    internal DomainResult(T? value, DomainError? error)
         : base(error)
     {
         Value = value;
@@ -50,8 +55,8 @@ public sealed class DomainResult<T> : DomainResult
 
     public T? Value { get; }
 
-    public new static DomainResult<T> Success(T value) => new(value, null);
+    internal static DomainResult<T> Success(T value) => new(value, null);
 
-    public new static DomainResult<T> Failure(DomainErrorCode code, string message) =>
+    internal new static DomainResult<T> Failure(DomainErrorCode code, string message) =>
         new(default, new DomainError(code, message));
 }

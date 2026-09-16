@@ -42,13 +42,13 @@ public sealed class Team : AggregateRoot
     {
         if (id.IsEmpty || authorityDomainId.IsEmpty || string.IsNullOrWhiteSpace(name))
         {
-            return DomainResult<Team>.Failure(DomainErrorCode.InvalidInput, "Team requires non-empty identity, authority domain, and name.");
+            return DomainResult.Failure<Team>(DomainErrorCode.InvalidInput, "Team requires non-empty identity, authority domain, and name.");
         }
 
         DomainResult authorization = authority.Authorize(Capability.Administration, authorityDomainId, teamId: id);
         if (!authorization.Succeeded)
         {
-            return DomainResult<Team>.Failure(authorization.Error!.Code, authorization.Error.Message);
+            return DomainResult.Failure<Team>(authorization.Error!.Code, authorization.Error.Message);
         }
 
         Team team = new(id, authorityDomainId, name.Trim());
@@ -59,7 +59,7 @@ public sealed class Team : AggregateRoot
             registeredAt.ToUniversalTime(),
             version));
 
-        return DomainResult<Team>.Success(team);
+        return DomainResult.Success(team);
     }
 
     public DomainResult CommitToAssignment(

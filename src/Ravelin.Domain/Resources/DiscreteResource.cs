@@ -3,6 +3,7 @@ using Ravelin.Domain.Events;
 using Ravelin.Domain.Model;
 using Ravelin.Domain.Primitives;
 using Ravelin.Domain.Results;
+using AuthorityCapability = Ravelin.Domain.Authority.Capability;
 
 namespace Ravelin.Domain.Resources;
 
@@ -92,15 +93,15 @@ public sealed class DiscreteResource : AggregateRoot
     {
         if (id.IsEmpty || authorityDomainId.IsEmpty || string.IsNullOrWhiteSpace(capability.Code) || string.IsNullOrWhiteSpace(name))
         {
-            return DomainResult<DiscreteResource>.Failure(
+            return DomainResult.Failure<DiscreteResource>(
                 DomainErrorCode.InvalidInput,
                 "Discrete resource requires identity, authority domain, capability, and name.");
         }
 
-        DomainResult authorization = authority.Authorize(Capability.Administration, authorityDomainId, resourceId: id);
+        DomainResult authorization = authority.Authorize(AuthorityCapability.Administration, authorityDomainId, resourceId: id);
         if (!authorization.Succeeded)
         {
-            return DomainResult<DiscreteResource>.Failure(authorization.Error!.Code, authorization.Error.Message);
+            return DomainResult.Failure<DiscreteResource>(authorization.Error!.Code, authorization.Error.Message);
         }
 
         DiscreteResource resource = new(id, authorityDomainId, new ResourceCapability(capability.Code.Trim()), name.Trim());
@@ -111,7 +112,7 @@ public sealed class DiscreteResource : AggregateRoot
             registeredAt.ToUniversalTime(),
             version));
 
-        return DomainResult<DiscreteResource>.Success(resource);
+        return DomainResult.Success(resource);
     }
 
     public DomainResult<ResourceAllocation> Allocate(
@@ -124,38 +125,38 @@ public sealed class DiscreteResource : AggregateRoot
         DomainResult precondition = RequireVersion(expectedVersion);
         if (!precondition.Succeeded)
         {
-            return DomainResult<ResourceAllocation>.Failure(precondition.Error!.Code, precondition.Error.Message);
+            return DomainResult.Failure<ResourceAllocation>(precondition.Error!.Code, precondition.Error.Message);
         }
 
         DomainResult authorization = authority.Authorize(
-            Capability.ResourceCustody,
+            AuthorityCapability.ResourceCustody,
             AuthorityDomainId,
             target.IncidentId,
             Id,
             target.CustodyHolder.TeamId);
         if (!authorization.Succeeded)
         {
-            return DomainResult<ResourceAllocation>.Failure(authorization.Error!.Code, authorization.Error.Message);
+            return DomainResult.Failure<ResourceAllocation>(authorization.Error!.Code, authorization.Error.Message);
         }
 
         if (allocationId.IsEmpty || target.IncidentId.IsEmpty || target.CustodyHolder.ActorId.IsEmpty)
         {
-            return DomainResult<ResourceAllocation>.Failure(DomainErrorCode.InvalidInput, "Allocation identity, incident, and custodian actor are required.");
+            return DomainResult.Failure<ResourceAllocation>(DomainErrorCode.InvalidInput, "Allocation identity, incident, and custodian actor are required.");
         }
 
         if (target.AuthorityDomainId != AuthorityDomainId)
         {
-            return DomainResult<ResourceAllocation>.Failure(DomainErrorCode.WrongAuthorityDomain, "Allocation target belongs to another authority domain.");
+            return DomainResult.Failure<ResourceAllocation>(DomainErrorCode.WrongAuthorityDomain, "Allocation target belongs to another authority domain.");
         }
 
         if (Status == ResourceStatus.Unavailable)
         {
-            return DomainResult<ResourceAllocation>.Failure(DomainErrorCode.ResourceUnavailable, "Unavailable resource cannot be allocated.");
+            return DomainResult.Failure<ResourceAllocation>(DomainErrorCode.ResourceUnavailable, "Unavailable resource cannot be allocated.");
         }
 
         if (CurrentAllocation is not null || Status == ResourceStatus.Allocated)
         {
-            return DomainResult<ResourceAllocation>.Failure(DomainErrorCode.ResourceAlreadyAllocated, "Resource already has authoritative active custody.");
+            return DomainResult.Failure<ResourceAllocation>(DomainErrorCode.ResourceAlreadyAllocated, "Resource already has authoritative active custody.");
         }
 
         ResourceAllocation allocation = new(
@@ -183,7 +184,7 @@ public sealed class DiscreteResource : AggregateRoot
             effectiveAt.ToUniversalTime(),
             version));
 
-        return DomainResult<ResourceAllocation>.Success(allocation);
+        return DomainResult.Success(allocation);
     }
 
     public DomainResult<ResourceAllocation> Release(
@@ -195,23 +196,23 @@ public sealed class DiscreteResource : AggregateRoot
         DomainResult precondition = RequireVersion(expectedVersion);
         if (!precondition.Succeeded)
         {
-            return DomainResult<ResourceAllocation>.Failure(precondition.Error!.Code, precondition.Error.Message);
+            return DomainResult.Failure<ResourceAllocation>(precondition.Error!.Code, precondition.Error.Message);
         }
 
         if (CurrentAllocation is null || CurrentAllocation.Id != allocationId)
         {
-            return DomainResult<ResourceAllocation>.Failure(DomainErrorCode.AllocationMismatch, "Specified allocation is not the active custody record.");
+            return DomainResult.Failure<ResourceAllocation>(DomainErrorCode.AllocationMismatch, "Specified allocation is not the active custody record.");
         }
 
         DomainResult authorization = authority.Authorize(
-            Capability.ResourceCustody,
+            AuthorityCapability.ResourceCustody,
             AuthorityDomainId,
             CurrentAllocation.IncidentId,
             Id,
             CurrentAllocation.CustodyHolder.TeamId);
         if (!authorization.Succeeded)
         {
-            return DomainResult<ResourceAllocation>.Failure(authorization.Error!.Code, authorization.Error.Message);
+            return DomainResult.Failure<ResourceAllocation>(authorization.Error!.Code, authorization.Error.Message);
         }
 
         ResourceAllocation released = CurrentAllocation.Release(authority.ActorId, releasedAt);
@@ -225,7 +226,7 @@ public sealed class DiscreteResource : AggregateRoot
             releasedAt.ToUniversalTime(),
             version));
 
-        return DomainResult<ResourceAllocation>.Success(released);
+        return DomainResult.Success(released);
     }
 
     public DomainResult<CustodyTransfer> TransferCustody(
@@ -239,28 +240,28 @@ public sealed class DiscreteResource : AggregateRoot
         DomainResult precondition = RequireVersion(expectedVersion);
         if (!precondition.Succeeded)
         {
-            return DomainResult<CustodyTransfer>.Failure(precondition.Error!.Code, precondition.Error.Message);
+            return DomainResult.Failure<CustodyTransfer>(precondition.Error!.Code, precondition.Error.Message);
         }
 
         if (CurrentAllocation is null || CurrentAllocation.Id != currentAllocationId)
         {
-            return DomainResult<CustodyTransfer>.Failure(DomainErrorCode.AllocationMismatch, "Specified allocation is not the active custody record.");
+            return DomainResult.Failure<CustodyTransfer>(DomainErrorCode.AllocationMismatch, "Specified allocation is not the active custody record.");
         }
 
         DomainResult authorization = authority.Authorize(
-            Capability.ResourceCustody,
+            AuthorityCapability.ResourceCustody,
             AuthorityDomainId,
             newTarget.IncidentId,
             Id,
             newTarget.CustodyHolder.TeamId);
         if (!authorization.Succeeded)
         {
-            return DomainResult<CustodyTransfer>.Failure(authorization.Error!.Code, authorization.Error.Message);
+            return DomainResult.Failure<CustodyTransfer>(authorization.Error!.Code, authorization.Error.Message);
         }
 
         if (newAllocationId.IsEmpty || newTarget.AuthorityDomainId != AuthorityDomainId || newTarget.IncidentId.IsEmpty || newTarget.CustodyHolder.ActorId.IsEmpty)
         {
-            return DomainResult<CustodyTransfer>.Failure(DomainErrorCode.InvalidInput, "New custody target is invalid or belongs to another authority domain.");
+            return DomainResult.Failure<CustodyTransfer>(DomainErrorCode.InvalidInput, "New custody target is invalid or belongs to another authority domain.");
         }
 
         ResourceAllocation previous = CurrentAllocation.Release(authority.ActorId, transferredAt);
@@ -288,7 +289,7 @@ public sealed class DiscreteResource : AggregateRoot
             transferredAt.ToUniversalTime(),
             version));
 
-        return DomainResult<CustodyTransfer>.Success(new CustodyTransfer(previous, current));
+        return DomainResult.Success(new CustodyTransfer(previous, current));
     }
 
     public DomainResult MarkUnavailable(
@@ -302,7 +303,7 @@ public sealed class DiscreteResource : AggregateRoot
             return precondition;
         }
 
-        DomainResult authorization = authority.Authorize(Capability.ResourceCoordination, AuthorityDomainId, resourceId: Id);
+        DomainResult authorization = authority.Authorize(AuthorityCapability.ResourceCoordination, AuthorityDomainId, resourceId: Id);
         if (!authorization.Succeeded)
         {
             return authorization;
@@ -341,7 +342,7 @@ public sealed class DiscreteResource : AggregateRoot
             return precondition;
         }
 
-        DomainResult authorization = authority.Authorize(Capability.ResourceCoordination, AuthorityDomainId, resourceId: Id);
+        DomainResult authorization = authority.Authorize(AuthorityCapability.ResourceCoordination, AuthorityDomainId, resourceId: Id);
         if (!authorization.Succeeded)
         {
             return authorization;

@@ -112,11 +112,11 @@ public sealed class AuthorityDomain
     {
         if (id.IsEmpty || string.IsNullOrWhiteSpace(name))
         {
-            return DomainResult<AuthorityDomain>.Failure(
+            return DomainResult.Failure<AuthorityDomain>(
                 DomainErrorCode.InvalidInput,
                 "Authority domain requires a non-empty identifier and name.");
         }
 
-        return DomainResult<AuthorityDomain>.Success(new AuthorityDomain(id, name.Trim()));
+        return DomainResult.Success(new AuthorityDomain(id, name.Trim()));
     }
 }

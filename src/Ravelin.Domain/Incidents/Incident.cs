@@ -86,7 +86,7 @@ public sealed class Incident : AggregateRoot
     {
         if (id.IsEmpty || authorityDomainId.IsEmpty || string.IsNullOrWhiteSpace(name))
         {
-            return DomainResult<Incident>.Failure(
+            return DomainResult.Failure<Incident>(
                 DomainErrorCode.InvalidInput,
                 "Incident requires non-empty identity, authority domain, and name.");
         }
@@ -94,7 +94,7 @@ public sealed class Incident : AggregateRoot
         DomainResult authorization = authority.Authorize(Capability.IncidentCommand, authorityDomainId, id);
         if (!authorization.Succeeded)
         {
-            return DomainResult<Incident>.Failure(authorization.Error!.Code, authorization.Error.Message);
+            return DomainResult.Failure<Incident>(authorization.Error!.Code, authorization.Error.Message);
         }
 
         Incident incident = new(id, authorityDomainId, name.Trim());
@@ -105,7 +105,7 @@ public sealed class Incident : AggregateRoot
             openedAt.ToUniversalTime(),
             version));
 
-        return DomainResult<Incident>.Success(incident);
+        return DomainResult.Success(incident);
     }
 
     public DomainResult<OperationalPeriod> StartOperationalPeriod(
@@ -117,35 +117,35 @@ public sealed class Incident : AggregateRoot
         DomainResult precondition = RequireVersion(expectedVersion);
         if (!precondition.Succeeded)
         {
-            return DomainResult<OperationalPeriod>.Failure(precondition.Error!.Code, precondition.Error.Message);
+            return DomainResult.Failure<OperationalPeriod>(precondition.Error!.Code, precondition.Error.Message);
         }
 
         DomainResult authorization = authority.Authorize(Capability.IncidentCommand, AuthorityDomainId, Id);
         if (!authorization.Succeeded)
         {
-            return DomainResult<OperationalPeriod>.Failure(authorization.Error!.Code, authorization.Error.Message);
+            return DomainResult.Failure<OperationalPeriod>(authorization.Error!.Code, authorization.Error.Message);
         }
 
         if (Status == IncidentStatus.Closed)
         {
-            return DomainResult<OperationalPeriod>.Failure(DomainErrorCode.ClosedIncident, "Closed incidents reject new operational periods.");
+            return DomainResult.Failure<OperationalPeriod>(DomainErrorCode.ClosedIncident, "Closed incidents reject new operational periods.");
         }
 
         if (periodId.IsEmpty)
         {
-            return DomainResult<OperationalPeriod>.Failure(DomainErrorCode.InvalidInput, "Operational period identifier is required.");
+            return DomainResult.Failure<OperationalPeriod>(DomainErrorCode.InvalidInput, "Operational period identifier is required.");
         }
 
         if (CurrentOperationalPeriodId is not null)
         {
-            return DomainResult<OperationalPeriod>.Failure(
+            return DomainResult.Failure<OperationalPeriod>(
                 DomainErrorCode.OperationalPeriodConflict,
                 "An operational period is already current for this incident.");
         }
 
         if (_operationalPeriods.Exists(period => period.Id == periodId))
         {
-            return DomainResult<OperationalPeriod>.Failure(DomainErrorCode.InvalidInput, "Operational period identifier already exists in this incident.");
+            return DomainResult.Failure<OperationalPeriod>(DomainErrorCode.InvalidInput, "Operational period identifier already exists in this incident.");
         }
 
         OperationalPeriod period = new(periodId, Id, openedAt);
@@ -158,7 +158,7 @@ public sealed class Incident : AggregateRoot
             openedAt.ToUniversalTime(),
             version));
 
-        return DomainResult<OperationalPeriod>.Success(period);
+        return DomainResult.Success(period);
     }
 
     public DomainResult CloseOperationalPeriod(

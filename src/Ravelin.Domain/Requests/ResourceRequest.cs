@@ -5,6 +5,7 @@ using Ravelin.Domain.Model;
 using Ravelin.Domain.Primitives;
 using Ravelin.Domain.Resources;
 using Ravelin.Domain.Results;
+using AuthorityCapability = Ravelin.Domain.Authority.Capability;
 
 namespace Ravelin.Domain.Requests;
 
@@ -93,7 +94,7 @@ public sealed class ResourceRequest : AggregateRoot
             return DomainResult<ResourceRequest>.Failure(DomainErrorCode.OperationalPeriodConflict, "Resource request requires the current open operational period.");
         }
 
-        DomainResult authorization = authority.Authorize(Capability.ResourceCoordination, incident.AuthorityDomainId, incident.Id);
+        DomainResult authorization = authority.Authorize(AuthorityCapability.ResourceCoordination, incident.AuthorityDomainId, incident.Id);
         if (!authorization.Succeeded)
         {
             return DomainResult<ResourceRequest>.Failure(authorization.Error!.Code, authorization.Error.Message);
@@ -134,7 +135,7 @@ public sealed class ResourceRequest : AggregateRoot
         }
 
         DomainResult authorization = authority.Authorize(
-            Capability.ResourceCoordination,
+            AuthorityCapability.ResourceCoordination,
             AuthorityDomainId,
             IncidentId,
             allocation.ResourceId,
@@ -196,7 +197,7 @@ public sealed class ResourceRequest : AggregateRoot
             return precondition;
         }
 
-        DomainResult authorization = authority.Authorize(Capability.ResourceCoordination, AuthorityDomainId, IncidentId);
+        DomainResult authorization = authority.Authorize(AuthorityCapability.ResourceCoordination, AuthorityDomainId, IncidentId);
         if (!authorization.Succeeded)
         {
             return authorization;
