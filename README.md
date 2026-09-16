@@ -2,6 +2,20 @@
 
 RAVELIN is an offline-capable incident and resource command system for organizations coordinating field teams and scarce resources under unreliable connectivity.
 
-This repository was initialized as a greenfield project on 2026-09-16.
+## Current state
 
-No application implementation is established by this commit. Architecture, governance, implementation scope, and acceptance are controlled through the KIRION Forge project nest.
+RAVELIN is a greenfield KIRION Forge-managed project. The accepted architecture is an edge-authority, local-first system with explicit command/event synchronization and reconciliation.
+
+No application implementation is accepted yet.
+
+Start with:
+
+- `AGENTS.md`
+- `.forge/SSOT_CURRENT.md`
+- `.forge/AUTHORITY.md`
+- `.forge/ARCHITECTURE.md`
+- `.forge/NEST.md`
+
+Forge source authority used for the initial nest:
+
+`Kirch-Nairu/KIRION-FORGE@44eb57e5b45b343be0033bf22a7a5e74d543c01a`
