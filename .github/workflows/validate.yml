@@ -42,5 +42,29 @@ jobs:
       - name: Architecture tests
         run: dotnet test tests/Ravelin.Architecture.Tests/Ravelin.Architecture.Tests.csproj --configuration Release --no-build
 
+      - name: Authority liveness smoke
+        shell: bash
+        run: |
+          set -euo pipefail
+          log_file="${RUNNER_TEMP}/ravelin-authority.log"
+          dotnet run \
+            --project src/Ravelin.Authority/Ravelin.Authority.csproj \
+            --configuration Release \
+            --no-build \
+            --urls http://127.0.0.1:5080 >"${log_file}" 2>&1 &
+          authority_pid=$!
+          trap 'kill "${authority_pid}" 2>/dev/null || true' EXIT
+
+          for attempt in {1..30}; do
+            if response=$(curl --fail --silent http://127.0.0.1:5080/health/live); then
+              test "${response}" = '{"status":"live"}'
+              exit 0
+            fi
+            sleep 1
+          done
+
+          cat "${log_file}"
+          exit 1
+
       - name: Format verification
         run: dotnet format Ravelin.slnx --verify-no-changes --no-restore
