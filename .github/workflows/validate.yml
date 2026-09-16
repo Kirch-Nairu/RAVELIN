@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - main
-      - KIRCH-RAVELIN-F01-FOUNDATION
+      - KIRCH-RAVELIN-F02-DOMAIN-AUTHORITY
   pull_request:
     branches:
       - main

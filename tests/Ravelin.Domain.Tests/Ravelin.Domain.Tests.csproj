@@ -10,5 +10,6 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="../../src/Ravelin.Domain/Ravelin.Domain.csproj" />
+    <ProjectReference Include="../../src/Ravelin.Application/Ravelin.Application.csproj" />
   </ItemGroup>
 </Project>
