@@ -28,7 +28,7 @@ public sealed class ResourceTests
         Assert.IsTrue(result.Succeeded);
         Assert.AreEqual(ResourceStatus.Allocated, resource.Status);
         Assert.AreEqual(allocationId, resource.CurrentAllocation?.Id);
-        Assert.IsInstanceOfType<ResourceAllocatedEvent>(resource.PendingEvents.Last());
+        Assert.IsInstanceOfType<ResourceAllocatedEvent>(resource.PendingEvents[^1]);
     }
 
     [TestMethod]
@@ -128,7 +128,7 @@ public sealed class ResourceTests
         Assert.AreEqual(ResourceAllocationStatus.Released, transfer.Value?.PreviousAllocation.Status);
         Assert.AreEqual(ResourceAllocationStatus.Active, transfer.Value?.CurrentAllocation.Status);
         Assert.AreEqual(transfer.Value?.CurrentAllocation.Id, resource.CurrentAllocation?.Id);
-        Assert.IsInstanceOfType<ResourceCustodyTransferredEvent>(resource.PendingEvents.Last());
+        Assert.IsInstanceOfType<ResourceCustodyTransferredEvent>(resource.PendingEvents[^1]);
     }
 
     [TestMethod]

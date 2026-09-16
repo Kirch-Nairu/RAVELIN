@@ -118,7 +118,7 @@ public sealed class IncidentTests
         Assert.IsTrue(closeSecond.Succeeded);
         Assert.IsTrue(closeIncident.Succeeded);
         Assert.AreEqual(IncidentStatus.Closed, incident.Status);
-        Assert.IsInstanceOfType<IncidentClosedEvent>(incident.PendingEvents.Last());
+        Assert.IsInstanceOfType<IncidentClosedEvent>(incident.PendingEvents[^1]);
     }
 
     private static Incident OpenIncident()

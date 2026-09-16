@@ -41,7 +41,7 @@ public sealed class AssignmentTests
         Assert.AreEqual(AssignmentStatus.InProgress, assignment.Status);
         Assert.IsTrue(assignment.Complete(field, assignment.Version, At.AddMinutes(4)).Succeeded);
         Assert.AreEqual(AssignmentStatus.Completed, assignment.Status);
-        Assert.IsInstanceOfType<AssignmentCompletedEvent>(assignment.PendingEvents.Last());
+        Assert.IsInstanceOfType<AssignmentCompletedEvent>(assignment.PendingEvents[^1]);
     }
 
     [TestMethod]
